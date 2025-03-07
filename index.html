@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chaotic Cipher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        input, textarea, button {
+            width: 80%;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background: #0f0;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0c0;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #0f0;
+            padding: 10px;
+            background: black;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chaotic XOR Cipher</h1>
+    <textarea id="inputText" placeholder="Enter text"></textarea>
+    <input type="text" id="passphrase" placeholder="Enter passphrase">
+    <button onclick="encrypt()">Encrypt</button>
+    <button onclick="decrypt()">Decrypt</button>
+    <h2>Result:</h2>
+    <pre id="output"></pre>
+
+    <script>
+        function chaoticXorCipher(text, passphrase, encrypt = true) {
+            let x0 = 0.5, r = 3.7;
+            let k = passphrase.charCodeAt(0) % 256; // Convert passphrase to a numeric key
+
+            let shifts = [];
+            for (let i = 0; i < text.length * 3; i++) {
+                x0 = r * x0 * (1 - x0);
+                shifts.push((Math.floor(x0 * 100) % 256) ^ k);
+            }
+
+            let transformedText = text.split('').map((char, i) => 
+                String.fromCharCode(char.charCodeAt(0) ^ shifts[i % shifts.length])
+            ).join('');
+
+            return encrypt ? btoa(transformedText) : transformedText;
+        }
+
+        function encrypt() {
+            let text = document.getElementById("inputText").value.trim();
+            let passphrase = document.getElementById("passphrase").value.trim();
+            if (!text || !passphrase) {
+                document.getElementById("output").innerText = "Error: Text and passphrase required!";
+                return;
+            }
+            document.getElementById("output").innerText = chaoticXorCipher(text, passphrase, true);
+        }
+
+        function decrypt() {
+            let text = document.getElementById("inputText").value.trim();
+            let passphrase = document.getElementById("passphrase").value.trim();
+            if (!text || !passphrase) {
+                document.getElementById("output").innerText = "Error: Encrypted text and passphrase required!";
+                return;
+            }
+            try {
+                let decodedText = atob(text);
+                document.getElementById("output").innerText = chaoticXorCipher(decodedText, passphrase, false);
+            } catch (error) {
+                document.getElementById("output").innerText = "Error: Invalid encrypted text!";
+            }
+        }
+    </script>
+
+</body>
+</html>
