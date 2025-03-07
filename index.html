@@ -15,8 +15,11 @@
             font-family: 'Orbitron', sans-serif;
             overflow: hidden;
             position: relative;
+            margin: 0;
+            padding: 0;
         }
 
+        /* Matrix Effect */
         canvas {
             position: fixed;
             top: 0;
@@ -51,6 +54,10 @@
             transition: 0.3s ease-in-out;
         }
 
+        .form-control:focus {
+            box-shadow: 0px 0px 10px #00ffcc;
+        }
+
         .btn-custom {
             width: 100%;
             padding: 12px;
@@ -68,97 +75,70 @@
             box-shadow: 0px 0px 15px #00ffcc;
         }
 
-        .alert {
-            word-wrap: break-word;
-            max-width: 100%;
-            overflow: hidden;
-            text-align: left;
-            padding: 10px;
-            border: 2px solid #00ffcc;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px #00ffcc;
-        }
-
-        .copy-btn {
-            cursor: pointer;
-            font-size: 18px;
-            background: rgba(0, 255, 204, 0.2);
-            color: #00ffcc;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: 0.3s ease-in-out;
-        }
     </style>
 </head>
 <body>
+
     <canvas id="matrixCanvas"></canvas>
+
     <div class="container">
         <h2>🔐 Chaotic XOR Cipher</h2>
-        <div class="mb-3">
-            <label for="text" class="form-label">Enter Text:</label>
-            <textarea class="form-control" id="text" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="key" class="form-label">Passphrase:</label>
-            <input type="text" class="form-control" id="key" required>
-        </div>
-        <div class="d-grid gap-2">
-            <button class="btn btn-custom" onclick="encryptText()">🔐 Encrypt</button>
-            <button class="btn btn-custom" onclick="decryptText()">🔓 Decrypt</button>
-        </div>
-        <div class="alert alert-dark mt-3" id="result-container" style="display: none;">
-            <strong>Result:</strong>
-            <span id="result-text"></span>
-            <button class="copy-btn" onclick="copyToClipboard()"><i class="fas fa-copy"></i></button>
-        </div>
+
+        <form>
+            <div class="mb-3">
+                <label for="text" class="form-label">Enter Text:</label>
+                <textarea class="form-control" id="text" rows="3" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="key" class="form-label">Passphrase:</label>
+                <input type="text" class="form-control" id="key" required>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="button" class="btn btn-custom">🔐 Encrypt</button>
+                <button type="button" class="btn btn-custom">🔓 Decrypt</button>
+            </div>
+        </form>
     </div>
+
     <script>
-        function chaoticXOR(text, key, rounds = 3) {
-            let x0 = 0.5, r = 3.7;
-            let shifts = [];
-            for (let i = 0; i < text.length * rounds; i++) {
-                x0 = r * x0 * (1 - x0);
-                shifts.push((Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length));
-            }
-            let result = text.split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ shifts[i])).join('');
-            return result;
-        }
+        // Matrix Rain Effect
+        const canvas = document.getElementById("matrixCanvas");
+        const ctx = canvas.getContext("2d");
 
-        function encryptText() {
-            let text = document.getElementById("text").value;
-            let key = document.getElementById("key").value;
-            if (!text || !key) {
-                alert("Please enter text and passphrase!");
-                return;
-            }
-            let encrypted = btoa(chaoticXOR(text, key));
-            document.getElementById("result-text").innerText = encrypted;
-            document.getElementById("result-container").style.display = "block";
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
 
-        function decryptText() {
-            let text = document.getElementById("text").value;
-            let key = document.getElementById("key").value;
-            if (!text || !key) {
-                alert("Please enter text and passphrase!");
-                return;
-            }
-            try {
-                let decrypted = chaoticXOR(atob(text), key);
-                document.getElementById("result-text").innerText = decrypted;
-                document.getElementById("result-container").style.display = "block";
-            } catch (error) {
-                alert("Invalid encrypted text or passphrase!");
+        const letters = "01𓂀☠⚡⚙⌛▓█░▒";
+        const matrix = letters.split("");
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00ffcc";
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrix[Math.floor(Math.random() * matrix.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                drops[i]++;
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
             }
         }
 
-        function copyToClipboard() {
-            navigator.clipboard.writeText(document.getElementById("result-text").innerText).then(() => {
-                alert("Copied to clipboard!");
-            }).catch(err => {
-                alert("Failed to copy: " + err);
-            });
-        }
+        setInterval(drawMatrix, 50);
     </script>
+
 </body>
 </html>
