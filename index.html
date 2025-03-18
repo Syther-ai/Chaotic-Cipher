@@ -139,7 +139,7 @@
 
         setInterval(drawMatrix, 50);
     </script>
-    <script>
+<script>
     function chaoticXOREncryptDecrypt(text, key) {
         let x0 = 0.5, r = 3.7;
         let shifts = [];
@@ -179,36 +179,41 @@
         return result;
     }
 
-    document.querySelector(".btn-custom:nth-child(1)").addEventListener("click", function () {
-        let text = document.getElementById("text").value;
-        let key = document.getElementById("key").value;
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".btn-custom:nth-child(1)").addEventListener("click", function () {
+            let text = document.getElementById("text").value;
+            let key = document.getElementById("key").value;
 
-        if (!text || !key) {
-            alert("Please enter text and passphrase!");
-            return;
-        }
+            if (!text || !key) {
+                alert("Please enter text and passphrase!");
+                return;
+            }
 
-        let encryptedText = chaoticXOREncryptDecrypt(text, key);
-        alert("Encrypted Text (Base64 Encoded): " + encryptedText);
-    });
+            let encryptedText = chaoticXOREncryptDecrypt(text, key);
+            document.getElementById("text").value = encryptedText;
+            alert("Encrypted Text (Base64 Encoded): " + encryptedText);
+        });
 
-    document.querySelector(".btn-custom:nth-child(2)").addEventListener("click", function () {
-        let text = document.getElementById("text").value;
-        let key = document.getElementById("key").value;
+        document.querySelector(".btn-custom:nth-child(2)").addEventListener("click", function () {
+            let text = document.getElementById("text").value;
+            let key = document.getElementById("key").value;
 
-        if (!text || !key) {
-            alert("Please enter text and passphrase!");
-            return;
-        }
+            if (!text || !key) {
+                alert("Please enter text and passphrase!");
+                return;
+            }
 
-        try {
-            let decryptedText = chaoticXORDecrypt(text, key);
-            alert("Decrypted Text: " + decryptedText);
-        } catch (e) {
-            alert("Decryption failed! Ensure you enter the correct encrypted text.");
-        }
+            try {
+                let decryptedText = chaoticXORDecrypt(text, key);
+                document.getElementById("text").value = decryptedText;
+                alert("Decrypted Text: " + decryptedText);
+            } catch (e) {
+                alert("Decryption failed! Ensure you enter the correct encrypted text.");
+            }
+        });
     });
     </script>
+
 
 
 </body>
