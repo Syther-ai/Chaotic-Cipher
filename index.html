@@ -19,7 +19,6 @@
             padding: 0;
         }
 
-        /* Matrix Effect */
         canvas {
             position: fixed;
             top: 0;
@@ -74,30 +73,25 @@
             background: #00bfa5;
             box-shadow: 0px 0px 15px #00ffcc;
         }
-
     </style>
 </head>
 <body>
-
     <canvas id="matrixCanvas"></canvas>
 
     <div class="container">
         <h2>🔐 Chaotic XOR Cipher</h2>
-
         <form>
             <div class="mb-3">
                 <label for="text" class="form-label">Enter Text:</label>
                 <textarea class="form-control" id="text" rows="3" required></textarea>
             </div>
-
             <div class="mb-3">
                 <label for="key" class="form-label">Passphrase:</label>
                 <input type="text" class="form-control" id="key" required>
             </div>
-
             <div class="d-grid gap-2">
-                <button type="button" class="btn btn-custom">🔐 Encrypt</button>
-                <button type="button" class="btn btn-custom">🔓 Decrypt</button>
+                <button type="button" class="btn btn-custom" id="encryptBtn">🔐 Encrypt</button>
+                <button type="button" class="btn btn-custom" id="decryptBtn">🔓 Decrypt</button>
             </div>
         </form>
     </div>
@@ -136,85 +130,49 @@
                 }
             }
         }
-
         setInterval(drawMatrix, 50);
-    </script>
-<script>
-    function chaoticXOREncryptDecrypt(text, key) {
-        let x0 = 0.5, r = 3.7;
-        let shifts = [];
 
-        // Generate chaotic shifts
-        for (let i = 0; i < text.length * 3; i++) {
-            x0 = r * x0 * (1 - x0);
-            let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
-            shifts.push(shift);
+        // Chaotic XOR Cipher Logic
+        function chaoticXOREncryptDecrypt(text, key) {
+            let x0 = 0.5, r = 3.7;
+            let shifts = [];
+
+            for (let i = 0; i < text.length * 3; i++) {
+                x0 = r * x0 * (1 - x0);
+                let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
+                shifts.push(shift);
+            }
+
+            return btoa(text.split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ shifts[i])).join(''));
         }
 
-        let result = text.split('').map((char, i) => 
-            String.fromCharCode(char.charCodeAt(0) ^ shifts[i])
-        ).join('');
+        function chaoticXORDecrypt(ciphertext, key) {
+            let x0 = 0.5, r = 3.7;
+            let shifts = [];
+            let decodedText = atob(ciphertext);
 
-        return btoa(result); // Base64 encoding for encrypted output
-    }
+            for (let i = 0; i < decodedText.length * 3; i++) {
+                x0 = r * x0 * (1 - x0);
+                let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
+                shifts.push(shift);
+            }
 
-    function chaoticXORDecrypt(ciphertext, key) {
-        let x0 = 0.5, r = 3.7;
-        let shifts = [];
-
-        // Decode Base64 before decryption
-        let decodedText = atob(ciphertext);
-
-        // Generate chaotic shifts
-        for (let i = 0; i < decodedText.length * 3; i++) {
-            x0 = r * x0 * (1 - x0);
-            let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
-            shifts.push(shift);
+            return decodedText.split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ shifts[i])).join('');
         }
 
-        let result = decodedText.split('').map((char, i) => 
-            String.fromCharCode(char.charCodeAt(0) ^ shifts[i])
-        ).join('');
-
-        return result;
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelector(".btn-custom:nth-child(1)").addEventListener("click", function () {
+        document.getElementById("encryptBtn").addEventListener("click", function () {
             let text = document.getElementById("text").value;
             let key = document.getElementById("key").value;
-
-            if (!text || !key) {
-                alert("Please enter text and passphrase!");
-                return;
-            }
-
-            let encryptedText = chaoticXOREncryptDecrypt(text, key);
-            document.getElementById("text").value = encryptedText;
-            alert("Encrypted Text (Base64 Encoded): " + encryptedText);
+            if (!text || !key) return alert("Enter text and passphrase!");
+            document.getElementById("text").value = chaoticXOREncryptDecrypt(text, key);
         });
 
-        document.querySelector(".btn-custom:nth-child(2)").addEventListener("click", function () {
+        document.getElementById("decryptBtn").addEventListener("click", function () {
             let text = document.getElementById("text").value;
             let key = document.getElementById("key").value;
-
-            if (!text || !key) {
-                alert("Please enter text and passphrase!");
-                return;
-            }
-
-            try {
-                let decryptedText = chaoticXORDecrypt(text, key);
-                document.getElementById("text").value = decryptedText;
-                alert("Decrypted Text: " + decryptedText);
-            } catch (e) {
-                alert("Decryption failed! Ensure you enter the correct encrypted text.");
-            }
+            if (!text || !key) return alert("Enter text and passphrase!");
+            document.getElementById("text").value = chaoticXORDecrypt(text, key);
         });
-    });
     </script>
-
-
-
 </body>
 </html>
