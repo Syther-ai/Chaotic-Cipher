@@ -139,6 +139,77 @@
 
         setInterval(drawMatrix, 50);
     </script>
+    <script>
+    function chaoticXOREncryptDecrypt(text, key) {
+        let x0 = 0.5, r = 3.7;
+        let shifts = [];
+
+        // Generate chaotic shifts
+        for (let i = 0; i < text.length * 3; i++) {
+            x0 = r * x0 * (1 - x0);
+            let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
+            shifts.push(shift);
+        }
+
+        let result = text.split('').map((char, i) => 
+            String.fromCharCode(char.charCodeAt(0) ^ shifts[i])
+        ).join('');
+
+        return btoa(result); // Base64 encoding for encrypted output
+    }
+
+    function chaoticXORDecrypt(ciphertext, key) {
+        let x0 = 0.5, r = 3.7;
+        let shifts = [];
+
+        // Decode Base64 before decryption
+        let decodedText = atob(ciphertext);
+
+        // Generate chaotic shifts
+        for (let i = 0; i < decodedText.length * 3; i++) {
+            x0 = r * x0 * (1 - x0);
+            let shift = (Math.floor(x0 * 100) % 256) ^ key.charCodeAt(i % key.length);
+            shifts.push(shift);
+        }
+
+        let result = decodedText.split('').map((char, i) => 
+            String.fromCharCode(char.charCodeAt(0) ^ shifts[i])
+        ).join('');
+
+        return result;
+    }
+
+    document.querySelector(".btn-custom:nth-child(1)").addEventListener("click", function () {
+        let text = document.getElementById("text").value;
+        let key = document.getElementById("key").value;
+
+        if (!text || !key) {
+            alert("Please enter text and passphrase!");
+            return;
+        }
+
+        let encryptedText = chaoticXOREncryptDecrypt(text, key);
+        alert("Encrypted Text (Base64 Encoded): " + encryptedText);
+    });
+
+    document.querySelector(".btn-custom:nth-child(2)").addEventListener("click", function () {
+        let text = document.getElementById("text").value;
+        let key = document.getElementById("key").value;
+
+        if (!text || !key) {
+            alert("Please enter text and passphrase!");
+            return;
+        }
+
+        try {
+            let decryptedText = chaoticXORDecrypt(text, key);
+            alert("Decrypted Text: " + decryptedText);
+        } catch (e) {
+            alert("Decryption failed! Ensure you enter the correct encrypted text.");
+        }
+    });
+</script>
+
 
 </body>
 </html>
